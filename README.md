@@ -27,7 +27,7 @@ optional arguments:
 To use with a video file, run the script with the following arguments
 
 ```
-python3 inference.py -vid ./input.mp4 -s 224 -m resnet18.blob
+python3 inference.py -vid ./input.mp4 -s 224 -m models/resnet18.blob -o test.mp4
 ```
 
 To use with DepthAI 4K RGB camera, use instead

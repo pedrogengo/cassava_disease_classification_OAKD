@@ -50,15 +50,15 @@ if camera:
 
 else:
 
-    manip = pipeline.createImageManip()
-    manip.initialConfig.setResize(args.size, args.size)
+    # manip = pipeline.createImageManip()
+    # manip.initialConfig.setResize(args.size, args.size)
 
     face_in = pipeline.createXLinkIn()
     face_in.setStreamName("in_nn")
-    face_in.setNumFrames(1)
-    face_in.out.link(manip.inputImage)
+    # face_in.setNumFrames(1)
+    face_in.out.link(detection_nn.input)
 
-    manip.out.link(detection_nn.input)
+    # manip.out.link(detection_nn.input)
 
 # Create outputs
 xout_nn = pipeline.createXLinkOut()
@@ -130,7 +130,7 @@ with dai.Device(pipeline) as device:
 
         if not camera:
             nn_data = dai.NNData()
-            nn_data.setLayer("input", to_planar(frame, (180, 180)))
+            nn_data.setLayer("input", to_planar(frame, (args.size, args.size)))
             detection_in.send(nn_data)
 
         in_nn = q_nn.tryGet()
@@ -148,8 +148,10 @@ with dai.Device(pipeline) as device:
 
         if debug:
             # if the frame is available, draw bounding boxes on it and show the frame
+            frame = cv2.resize(frame, (480,480))
             if result is not None:
                 cv2.putText(frame, "{} ({}%)".format(result["name"], result["conf"]), (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+                
 
             cv2.imshow("rgb", frame)
 
