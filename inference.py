@@ -138,7 +138,7 @@ with dai.Device(pipeline) as device:
         if in_nn is not None:
             data = softmax(in_nn.getFirstLayerFp16())
             result_conf = np.max(data)
-            if result_conf > 0.5:
+            if result_conf > 0.7 or class_names[np.argmax(data)] == 'Healthy':
                 result = {
                     "name": class_names[np.argmax(data)],
                     "conf": round(100 * result_conf, 2)
