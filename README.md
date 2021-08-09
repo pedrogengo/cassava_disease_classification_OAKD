@@ -33,5 +33,5 @@ python3 inference.py -vid ./input.mp4 -s 224 -m resnet18.blob
 To use with DepthAI 4K RGB camera, use instead
 
 ```
-python3 inference.py -cam -s 224 -m resnet18.blob -o test.mp4
+python3 inference.py -cam -s 224 -m models/resnet18.blob -o test.mp4
 ``` 
