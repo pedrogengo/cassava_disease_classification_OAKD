@@ -12,6 +12,7 @@ parser.add_argument('-cam', '--camera', action="store_true", help="Use DepthAI 4
 parser.add_argument('-vid', '--video', type=str, help="Path to video file to be used for inference (conflicts with -cam)")
 parser.add_argument('-s', '--size', type=int, help="Size of input image. Expect to be a square image", required=True)
 parser.add_argument('-m', '--model', type=str, help="Model path", required=True)
+parser.add_argument('-o', '--output', type=str, help="Name of final video", required=False, default=None)
 args = parser.parse_args()
 
 if not args.camera and not args.video:
@@ -48,9 +49,16 @@ if camera:
     manip.out.link(detection_nn.input)
 
 else:
+
+    manip = pipeline.createImageManip()
+    manip.initialConfig.setResize(args.size, args.size)
+
     face_in = pipeline.createXLinkIn()
     face_in.setStreamName("in_nn")
-    face_in.out.link(detection_nn.input)
+    face_in.setNumFrames(1)
+    face_in.out.link(manip.inputImage)
+
+    manip.out.link(detection_nn.input)
 
 # Create outputs
 xout_nn = pipeline.createXLinkOut()
@@ -112,6 +120,8 @@ with dai.Device(pipeline) as device:
     class_names = ["CBB",  "CBSD", "CGM", "CMD", "Healthy"]
     result = None
 
+    if args.output is not None:
+        video = cv2.VideoWriter(args.output,-1,30,(480,480))
     while should_run():
         read_correctly, frame = get_frame()
 
@@ -147,3 +157,5 @@ with dai.Device(pipeline) as device:
                 break
         elif result is not None:
             print("{} ({}%)".format(result["name"], result["conf"]))
+        if args.output is not None:
+            video.write(frame)
